@@ -714,6 +714,13 @@
             <div class="s4-field-label">Your theme:</div>
             <textarea class="s4-textarea" id="s4-pattern" style="min-height:120px;"></textarea>
         </div>
+        <div id="s4-submit-bar" style="background:white;border-radius:var(--radius);border:1px solid var(--border);padding:14px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;">
+            <span style="font-size:0.78rem;color:#64748b;flex:1;">Submit your theme when you’re ready. You can resubmit after making changes.</span>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+                <button class="s3-submit-btn" id="s4-submit-btn" onclick="submitTheme()">Submit Theme</button>
+                <p id="submit-theme-status" style="font-size:0.72rem;color:#94a3b8;margin:0;text-align:right;"></p>
+            </div>
+        </div>
         <div style="background:white;border-radius:var(--radius);border:1px solid var(--border);padding:14px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;">
             <span style="font-size:0.78rem;color:#64748b;flex:1;">Open a clean summary of your analysis to save or print.</span>
             <button class="btn" id="s4-export-btn" style="background:var(--accent);color:white;border-color:var(--accent);" onclick="openStage4Export()">Save a copy ↗</button>
@@ -1587,6 +1594,11 @@ ${pattern ? `<div class="theme-box"><p>${pattern}</p></div>` : '<p style="color:
                 const status = document.getElementById('submit-analysis-status');
                 if (status) status.textContent = 'Previously submitted.';
             }
+            // Reset Stage 4 submit button
+            const s4btn = document.getElementById('s4-submit-btn');
+            if (s4btn) { s4btn.textContent = 'Submit Theme'; s4btn.style.background = 'var(--success)'; }
+            const s4status = document.getElementById('submit-theme-status');
+            if (s4status) s4status.textContent = '';
         }
         if (num > 2  && currentMode === 'student') renderSampleAnalysis(num);
     };
@@ -1927,6 +1939,10 @@ ${pattern ? `<div class="theme-box"><p>${pattern}</p></div>` : '<p style="color:
             block.innerHTML = `<div class="s4-cat-header"><span class="s4-cat-name">${catName}</span>${phrase && phrase !== catName ? `<span class="s4-cat-phrase">${phrase}</span>` : ''}</div><div class="s4-cat-extracts">${extractRows || '<span style="color:#cbd5e1;font-size:0.78rem;">No extracts here.</span>'}</div>`;
             display.appendChild(block);
         });
+
+        // Show/hide submit bar (hidden for sample scripts)
+        const s4bar = document.getElementById('s4-submit-bar');
+        if (s4bar) s4bar.style.display = isSample ? 'none' : '';
     }
 
     // ── Submissions ───────────────────────────────────────────────────────────
@@ -2038,7 +2054,7 @@ ${pattern ? `<div class="theme-box"><p>${pattern}</p></div>` : '<p style="color:
             paneEl.innerHTML = '<p style="color:#94a3b8;font-size:0.82rem;padding:10px 0;">No Stage 3 submission found.</p>';
             return;
         }
-        let html = `<div class="analysis-pane-name">${label} — Stage 3: Categories &amp; Themes</div>`;
+        let html = `<div class="analysis-pane-name">${label} — Stage 3–4: Categories &amp; Theme</div>`;
         html += `<div class="analysis-review-card"><div class="analysis-review-header">Categories (${d.categories.length})</div><div class="analysis-review-body">`;
         d.categories.forEach(c => {
             html += `<div class="analysis-section"><div class="analysis-section-label">${c.name}</div>`;
