@@ -532,7 +532,7 @@
             <div class="card-header">
                 <span id="label-left">Transcript</span>
                 <div style="display: flex; gap: 8px; align-items: center;">
-                    <button class="btn" onclick="window.print()" style="font-size: 0.7rem; padding: 4px 8px;">Print / Save as PDF</button>
+                    <button class="btn" onclick="printTranscript()" style="font-size: 0.7rem; padding: 4px 8px;">Print / Save as PDF</button>
                     <select id="select-left" class="student-select hidden" onchange="applyReview(1)"></select>
                 </div>
             </div>
@@ -1191,7 +1191,7 @@
         [2, 3, 4].forEach(n => {
             const tab = document.getElementById('stab-' + n);
             if (!tab) return;
-                const clusters = document.querySelectorAll('.cluster-card');
+            const clusters = document.querySelectorAll('.cluster-card');
             const hasCodeInCluster = [...clusters].some(cl => cl.querySelectorAll('.pool-card').length > 0);
             const s2Complete = clusters.length > 0 && hasCodeInCluster;
             const locked = !isSample && (n >= 2 && !s1Submitted || n >= 3 && !s2Complete || n >= 4 && !s3Submitted);
@@ -1286,6 +1286,32 @@
         updateTabGates();
     }
 
+    function printTranscript() {
+        const transcriptEl = document.getElementById('t1');
+        if (!transcriptEl) return;
+        const transcriptHtml = transcriptEl.innerHTML;
+        const printBtnHtml = `<div id="print-bar" style="position:sticky;top:0;z-index:100;background:white;border-bottom:1px solid #e5e7eb;padding:10px 24px;display:flex;align-items:center;gap:12px;"><button onclick="window.print();return false;" style="background:#4f46e5;color:white;border:none;padding:9px 22px;border-radius:6px;font-size:0.9rem;font-weight:600;cursor:pointer;">Print / Save as PDF</button><span style="font-size:0.78rem;color:#94a3b8;">Highlights will appear automatically.</span></div>`;
+        const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Transcript</title>
+<style>
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; color: #1e293b; background: white; }
+  .transcript-body { max-width: 760px; margin: 0 auto; padding: 32px 24px; line-height: 3.8; font-size: 1rem; }
+  .p-block { margin-bottom: 24px; border-left: 2px solid #f1f5f9; padding-left: 18px; }
+  .speaker { font-weight: 700; color: #94a3b8; font-size: 0.72rem; text-transform: uppercase; display: block; margin-bottom: 4px; line-height: 1.2; }
+  .highlighted { display: inline; padding: 0.2em 0; border-radius: 4px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+  .teacher-label { font-size: 0.85rem; font-weight: 800; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; color: white; display: inline-flex; align-items: center; line-height: 1.1; margin-left: 6px; vertical-align: middle; }
+  .uncode-inline { display: none !important; }
+  @media print { #print-bar { display: none !important; } body { margin: 0; } }
+</style>
+</head><body>
+\${printBtnHtml}
+<div class="transcript-body">\${transcriptHtml}</div>
+</body></html>`;
+        const w = window.open('', '_blank');
+        if (w) { w.document.write(html); w.document.close(); }
+        else { showGateMessage('Popup blocked — please allow popups for this page and try again.'); }
+    }
+
     function openStage4Export() {
         const name    = document.getElementById('student-name')?.value.trim() || 'My Analysis';
         const pattern = document.getElementById('s4-pattern')?.value.trim()  || '';
@@ -1349,9 +1375,15 @@
   .speaker { font-weight: 700; color: #94a3b8; font-size: 0.72rem; text-transform: uppercase; display: block; margin-bottom: 4px; line-height: 1.2; }
   .theme-box { background:#fffbeb;border:1px solid #fcd34d;border-left:4px solid #f59e0b;border-radius:8px;padding:16px 20px;margin-top:4px; }
   .theme-box p { margin:0;font-size:0.95rem;line-height:1.7;color:#78350f;white-space:pre-wrap; }
-  @media print { body { margin: 20px; } }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+  #print-bar { position: sticky; top: 0; z-index: 100; background: white; border-bottom: 1px solid #e5e7eb; padding: 10px 24px; display: flex; align-items: center; gap: 12px; }
+  #print-bar button { background: #4f46e5; color: white; border: none; padding: 9px 22px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+  #print-bar span { font-size: 0.78rem; color: #94a3b8; }
+  @media print { #print-bar { display: none !important; } body { margin: 20px; } }
 </style>
 </head><body>
+<div id="print-bar"><button onclick="window.print()">Print / Save as PDF</button><span>Highlights will appear automatically.</span></div>
+<div style="max-width:760px;margin:0 auto;padding:32px 24px;">
 <h1>Qualitative Analysis</h1>
 <div class="meta">${scriptLabel} · ${name} · ${new Date().toLocaleDateString()}</div>
 
@@ -1365,6 +1397,7 @@ ${catsHtml || '<p style="color:#94a3b8;font-size:0.85rem;">No categories recorde
 ${pattern ? `<div class="theme-box"><p>${pattern}</p></div>` : '<p style="color:#94a3b8;font-size:0.85rem;">No theme written yet.</p>'}
 
 <p style="margin-top:48px;font-size:0.7rem;color:#cbd5e1;border-top:1px solid #f1f5f9;padding-top:12px;">Generated from the Qualitative Coding Workbook · © Southampton Education School 2026</p>
+</div>
 </body></html>`;
 
         const w = window.open('', '_blank');
