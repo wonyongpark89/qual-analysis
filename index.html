@@ -1691,6 +1691,29 @@ ${pattern ? `<div class="theme-box"><p>${pattern}</p></div>` : '<p style="color:
             });
     }
 
+    // ── Stage 4 submit ────────────────────────────────────────────────────────
+    function submitTheme() {
+        const name = document.getElementById('student-name').value.trim();
+        if (!name) { alert('Your name was not captured. Please refresh the page and enter your name on the landing screen.'); return; }
+        const pattern = document.getElementById('s4-pattern')?.value.trim() || '';
+        if (!pattern) { alert('Write your theme before submitting.'); return; }
+        const btn = document.getElementById('s4-submit-btn');
+        const status = document.getElementById('submit-theme-status');
+        btn.textContent = 'Sending…'; btn.style.background = '#94a3b8';
+        fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'record', name, scriptId: currentScript, data: JSON.stringify(gatherAnalysisData()) }) })
+            .then(() => {
+                btn.textContent = 'Submitted ✓'; btn.style.background = '#94a3b8';
+                if (status) status.textContent = 'Saved. You can resubmit after making changes.';
+                saveAnalysis();
+                setTimeout(() => { btn.textContent = 'Submit Theme'; btn.style.background = 'var(--success)'; }, 2000);
+            })
+            .catch(() => {
+                btn.textContent = 'Submit Theme'; btn.style.background = 'var(--success)';
+                if (status) status.textContent = 'Error — try again.';
+            });
+    }
+
+
     // ── Stage 2 ──────────────────────────────────────────────────────────────
     function rebuildCodePool() {
         const placedCodes = new Set();
