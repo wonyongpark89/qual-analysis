@@ -364,23 +364,54 @@
         .s3-drop-zone {
             min-height: 56px; border-radius: 6px;
             border: 2px dashed #e2e8f0;
-            display: flex; flex-direction: column; gap: 6px;
+            display: flex; flex-direction: column; gap: 8px;
             padding: 8px; transition: border-color 0.2s, background 0.2s;
         }
         .s3-drop-zone.drag-over { border-color: var(--accent); background: #eef2ff; }
+        /* Code-level block (replaces per-segment card) */
+        .s3-code-block {
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            cursor: grab;
+            background: white;
+        }
+        .s3-code-block:active { cursor: grabbing; }
+        .s3-code-block.dragging { opacity: 0.4; }
+        .s3-code-block-header {
+            display: flex; align-items: center; gap: 8px;
+            padding: 7px 10px;
+            user-select: none;
+        }
+        .s3-code-label {
+            flex-shrink: 0; padding: 2px 7px; border-radius: 4px;
+            font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.02em; white-space: nowrap;
+        }
+        .s3-code-count {
+            font-size: 0.68rem; color: #94a3b8; font-weight: 500;
+        }
+        .s3-drag-hint {
+            margin-left: auto; font-size: 0.72rem; color: #cbd5e1;
+            user-select: none;
+        }
+        .s3-extracts-list {
+            border-top: 1px solid #f1f5f9;
+            padding: 6px 10px 8px;
+            display: flex; flex-direction: column; gap: 4px;
+        }
+        .s3-extract-row {
+            font-size: 0.76rem; color: #64748b;
+            line-height: 1.5; font-style: italic;
+            padding-left: 6px; border-left: 2px solid #e2e8f0;
+        }
+        /* legacy — kept for sample scripts which still use per-entry display */
         .s3-code-card {
             display: flex; align-items: flex-start; gap: 8px;
             padding: 8px 10px; border-radius: 6px;
             background: #f8fafc; border: 1px solid #e2e8f0;
             border-left: 3px solid #94a3b8;
-            cursor: grab; font-size: 0.8rem;
-        }
-        .s3-code-card:active { cursor: grabbing; }
-        .s3-code-card.dragging { opacity: 0.4; }
-        .s3-code-label {
-            flex-shrink: 0; padding: 2px 7px; border-radius: 4px;
-            font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.02em; white-space: nowrap;
+            font-size: 0.8rem;
         }
         .s3-extract-text { color: #475569; line-height: 1.5; font-style: italic; }
 
@@ -1723,39 +1754,35 @@ ${pattern ? `<div class="theme-box"><p>${pattern}</p></div>` : '<p style="color:
         const clusters = document.querySelectorAll('.cluster-card');
         if (!clusters.length) { container.innerHTML = '<p style="color:#94a3b8;font-size:0.85rem;padding:20px 0;">No categories yet — go to Stage 2 and build some first.</p>'; return; }
 
-        // For samples, use sampleData for extracts; for live scripts use pool cards
         const allEntries = isSample ? (sampleData[currentScript] || []) : myCodes;
 
         clusters.forEach(cl => {
             const name = cl.querySelector('.cluster-name-input').value.trim() || '(unnamed)';
             const phrase = cl.querySelector('.cluster-category-input').value.trim();
 
-            // Determine codes in this cluster
             let codesInCluster;
             if (isSample) {
                 codesInCluster = cl.dataset.sampleCodes ? JSON.parse(cl.dataset.sampleCodes) : [];
             } else {
                 codesInCluster = [...cl.querySelectorAll('.pool-card')].map(c => c.dataset.code);
-                if (!codesInCluster.length) return; // skip empty for live scripts
+                if (!codesInCluster.length) return;
             }
 
             const div = document.createElement('div'); div.className = 's3-cluster-card'; div.dataset.clusterId = cl.id;
             const nameInput = isSample
                 ? `<input class="s3-name-input" type="text" value="${name}" readonly style="background:#f8fafc;cursor:default;" />`
-                : `<input class="s3-name-input" type="text" value="${name}" placeholder="Category name…" />`;
+                : `<input class="s3-name-input" type="text" value="${name}" placeholder="Category name\u2026" />`;
             const promptText = isSample
-                ? 'Example: observe how the extracts within each category relate — do they all describe the same underlying issue?'
-                : 'Read the extracts below. Does every code really fit here? Drag any that don\'t belong to a different category.';
+                ? 'Example: observe how the codes and their extracts within each category relate \u2014 do they all describe the same underlying issue?'
+                : 'Does every code really belong here? Drag any that don\'t fit to a different category.';
             div.innerHTML = `<div class="s3-top">${nameInput}</div>${phrase ? `<p class="s3-category-label">"${phrase}"</p>` : ''}<p class="s3-prompt">${promptText}</p><div class="s3-drop-zone" data-s3-cluster="${cl.id}"></div>`;
 
             const dropZone = div.querySelector('.s3-drop-zone');
             codesInCluster.forEach(codeName => {
                 const entries = allEntries.filter(m => m.code === codeName);
-                entries.forEach(e => {
-                    const card = createS3CodeCard(e, cl.id);
-                    if (isSample) { card.draggable = false; card.style.cursor = 'default'; }
-                    dropZone.appendChild(card);
-                });
+                if (!entries.length) return;
+                const block = createS3CodeBlock(codeName, entries, cl.id, isSample);
+                dropZone.appendChild(block);
             });
 
             if (!isSample) {
@@ -1765,60 +1792,100 @@ ${pattern ? `<div class="theme-box"><p>${pattern}</p></div>` : '<p style="color:
             container.appendChild(div);
         });
 
-        // Submit bar
         const bar = document.getElementById('s3-submit-bar');
         if (bar) bar.style.display = isSample ? 'none' : '';
         if (!isSample) {
             const btn = document.getElementById('s3-submit-btn');
-            if (s3Submitted) { btn.textContent = 'Submitted ✓'; btn.classList.add('sent'); }
+            if (s3Submitted) { btn.textContent = 'Submitted \u2713'; btn.classList.add('sent'); }
             else { btn.textContent = 'Submit Categories'; btn.classList.remove('sent'); }
         }
     }
 
-    function createS3CodeCard(entry, homeClusterId) {
-        const card = document.createElement('div'); card.className = 's3-code-card';
-        card.dataset.code = entry.code; card.dataset.entryId = entry.id; card.dataset.homeCluster = homeClusterId; card.draggable = true;
-        const parts = entry.color.match(/hsla\((\d+),\s*(\d+)%,\s*(\d+)%,\s*([\d.]+)\)/);
+    // Code-level block: shows code label + all its extracts as read-only text beneath
+    function createS3CodeBlock(codeName, entries, homeClusterId, isSample) {
+        const block = document.createElement('div');
+        block.className = 's3-code-block';
+        block.dataset.code = codeName;
+        block.dataset.homeCluster = homeClusterId;
+        if (!isSample) block.draggable = true;
+
+        const firstEntry = entries[0];
+        const parts = firstEntry.color.match(/hsla\((\d+),\s*(\d+)%,\s*(\d+)%,\s*([\d.]+)\)/);
         const darkColor = parts ? `hsla(${parts[1]}, ${parts[2]}%, 25%, 1)` : '#334155';
-        card.style.borderLeftColor = darkColor;
-        card.innerHTML = `<span class="s3-code-label" style="background:${entry.color};color:${darkColor}">${entry.code}</span><span class="s3-extract-text">"${entry.text.trim()}"</span>`;
-        card.addEventListener('dragstart', e => { e.dataTransfer.setData('s3entryId', entry.id); card.classList.add('dragging'); });
-        card.addEventListener('dragend', () => card.classList.remove('dragging'));
-        addS3TouchDrag(card); return card;
+        const countText = entries.length === 1 ? '1 extract' : `${entries.length} extracts`;
+        const extractsHtml = entries.map(e => `<div class="s3-extract-row">"${e.text.trim()}"</div>`).join('');
+
+        block.style.borderLeft = `3px solid ${darkColor}`;
+        block.innerHTML = `
+            <div class="s3-code-block-header" style="background:${firstEntry.color}20;">
+                <span class="s3-code-label" style="background:${firstEntry.color};color:${darkColor}">${codeName}</span>
+                <span class="s3-code-count">${countText}</span>
+                ${!isSample ? '<span class="s3-drag-hint">\u2807 drag</span>' : ''}
+            </div>
+            <div class="s3-extracts-list">${extractsHtml}</div>`;
+
+        if (!isSample) {
+            block.addEventListener('dragstart', e => { e.dataTransfer.setData('s3CodeName', codeName); block.classList.add('dragging'); });
+            block.addEventListener('dragend', () => block.classList.remove('dragging'));
+            addS3TouchDrag(block);
+        }
+        return block;
     }
 
     function setupS3DropZone(zone) {
         zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
         zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-        zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); moveS3CardToZone(zone, e.dataTransfer.getData('s3entryId')); });
+        zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); moveS3BlockToZone(zone, e.dataTransfer.getData('s3CodeName')); });
     }
 
-    function moveS3CardToZone(targetZone, entryId) {
-        const card = document.querySelector(`#s3-clusters-container .s3-code-card[data-entry-id="${entryId}"]`);
-        if (!card || card.closest('.s3-drop-zone') === targetZone) return;
-        targetZone.appendChild(card); syncS3MoveToStage2(card, targetZone);
+    function moveS3BlockToZone(targetZone, codeName) {
+        const block = document.querySelector(`#s3-clusters-container .s3-code-block[data-code="${CSS.escape(codeName)}"]`);
+        if (!block || block.closest('.s3-drop-zone') === targetZone) return;
+        targetZone.appendChild(block);
+        syncS3MoveToStage2(codeName, targetZone);
     }
 
-    function syncS3MoveToStage2(s3Card, targetZone) {
+    function syncS3MoveToStage2(codeName, targetZone) {
         const targetS3ClusterId = targetZone.closest('.s3-cluster-card').dataset.clusterId;
-        const poolCard = document.querySelector(`#clusters-wrap .pool-card[data-code="${CSS.escape(s3Card.dataset.code)}"]`); if (!poolCard) return;
-        const targetS2Zone = document.querySelector(`#${targetS3ClusterId} .cluster-drop-zone`); if (!targetS2Zone) return;
+        const poolCard = document.querySelector(`#clusters-wrap .pool-card[data-code="${CSS.escape(codeName)}"]`);
+        if (!poolCard) return;
+        const targetS2Zone = document.querySelector(`#${targetS3ClusterId} .cluster-drop-zone`);
+        if (!targetS2Zone) return;
         const oldBtn = poolCard.querySelector('.return-btn'); if (oldBtn) oldBtn.remove();
         const oldZone = poolCard.closest('.cluster-drop-zone');
         targetS2Zone.appendChild(poolCard);
         if (oldZone && !oldZone.querySelector('.pool-card')) { const ph = oldZone.querySelector('.drop-placeholder'); if (ph) ph.style.display = ''; }
         const newPh = targetS2Zone.querySelector('.drop-placeholder'); if (newPh) newPh.style.display = 'none';
-        const btn = document.createElement('span'); btn.className = 'return-btn'; btn.textContent = '×'; btn.title = 'Return to pool';
-        btn.addEventListener('click', ev => { ev.stopPropagation(); btn.remove(); document.getElementById('code-pool').appendChild(poolCard); if (!targetS2Zone.querySelector('.pool-card')) { const p2 = targetS2Zone.querySelector('.drop-placeholder'); if (p2) p2.style.display = ''; } });
+        const btn = document.createElement('span'); btn.className = 'return-btn'; btn.textContent = '\u00d7'; btn.title = 'Return to pool';
+        btn.addEventListener('click', ev => { ev.stopPropagation(); btn.remove(); document.getElementById('code-pool').appendChild(poolCard); if (!targetS2Zone.querySelector('.pool-card')) { const p2 = targetS2Zone.querySelector('.drop-placeholder'); if (p2) p2.style.display = ''; } saveAnalysis(); updateTabGates(); });
         poolCard.appendChild(btn);
     }
 
-    function addS3TouchDrag(card) {
+    function addS3TouchDrag(block) {
         let clone = null;
-        card.addEventListener('touchstart', e => { clone = document.createElement('div'); clone.className = 's3-code-card'; clone.innerHTML = card.innerHTML; clone.style.cssText = `position:fixed;opacity:0.85;pointer-events:none;z-index:9999;width:${card.offsetWidth}px;`; document.body.appendChild(clone); card.classList.add('dragging'); }, { passive: true });
-        card.addEventListener('touchmove', e => { e.preventDefault(); const t = e.touches[0]; if (clone) { clone.style.left = (t.clientX - card.offsetWidth/2) + 'px'; clone.style.top = (t.clientY - 20) + 'px'; } document.querySelectorAll('.s3-drop-zone').forEach(z => { const r = z.getBoundingClientRect(); z.classList.toggle('drag-over', t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom); }); }, { passive: false });
-        card.addEventListener('touchend', e => { card.classList.remove('dragging'); if (clone) { clone.remove(); clone = null; } const t = e.changedTouches[0]; document.querySelectorAll('.s3-drop-zone').forEach(z => { z.classList.remove('drag-over'); const r = z.getBoundingClientRect(); if (t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom) moveS3CardToZone(z, card.dataset.entryId); }); });
+        block.addEventListener('touchstart', e => {
+            const header = block.querySelector('.s3-code-block-header');
+            clone = document.createElement('div');
+            clone.className = 's3-code-block';
+            clone.innerHTML = header ? header.outerHTML : block.innerHTML;
+            clone.style.cssText = `position:fixed;opacity:0.85;pointer-events:none;z-index:9999;width:${block.offsetWidth}px;border-left:${block.style.borderLeft};border-radius:6px;overflow:hidden;`;
+            document.body.appendChild(clone);
+            block.classList.add('dragging');
+        }, { passive: true });
+        block.addEventListener('touchmove', e => {
+            e.preventDefault();
+            const t = e.touches[0];
+            if (clone) { clone.style.left = (t.clientX - block.offsetWidth / 2) + 'px'; clone.style.top = (t.clientY - 20) + 'px'; }
+            document.querySelectorAll('.s3-drop-zone').forEach(z => { const r = z.getBoundingClientRect(); z.classList.toggle('drag-over', t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom); });
+        }, { passive: false });
+        block.addEventListener('touchend', e => {
+            block.classList.remove('dragging');
+            if (clone) { clone.remove(); clone = null; }
+            const t = e.changedTouches[0];
+            document.querySelectorAll('.s3-drop-zone').forEach(z => { z.classList.remove('drag-over'); const r = z.getBoundingClientRect(); if (t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom) moveS3BlockToZone(z, block.dataset.code); });
+        });
     }
+
 
     // ── Stage 4 ──────────────────────────────────────────────────────────────
     function buildStage4() {
