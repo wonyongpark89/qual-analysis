@@ -71,7 +71,7 @@
 <a class="skip-link" href="#main-layout">Skip to the workspace</a>
 <header class="app-header">
     <div class="app-identity"><h1>Qualitative Coding Workbook</h1><p>Southampton Education School <span aria-hidden="true">/</span> EDUC6530</p></div>
-    <div class="session-tools"><span id="session-name"></span><div class="nav-group mode-switch" aria-label="Workbook mode">
+    <div class="session-tools"><span id="session-name"></span><button class="btn tour-replay" id="tour-start-btn" type="button">Interface tour</button><div class="nav-group mode-switch" aria-label="Workbook mode">
         <button id="btn-student-mode" class="btn btn-mode active" onclick="setMode('student')">Student</button>
         <button id="btn-teacher-mode" class="btn btn-mode" onclick="setMode('teacher')">Instructor</button>
     </div></div>
@@ -1764,5 +1764,6 @@ ${pattern ? `<div class="theme-box"><p>${esc(pattern)}</p></div>` :'<p style="co
 
 </script>
 <script src="workbook.js"></script>
+<script src="tour.js"></script>
 </body>
 </html>

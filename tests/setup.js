@@ -13,3 +13,4 @@ window.fetch = async (url, options) => {
   return { ok: true, text: async () => JSON.stringify(value) };
 };
 for (const key of ['coded_script_1','coded_script_2','analysis_script_1','analysis_script_2','qcw_student_name','qcw_s2_unlocked']) localStorage.removeItem(key);
+for (const name of ['workbook test', 'tour second student']) localStorage.removeItem(`qcw_interface_tour_v1:${name}`);

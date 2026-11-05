@@ -241,6 +241,20 @@ main.coding-bar-visible { margin-bottom: 91px; }
 .pw-box p { font-size: 13px !important; line-height: 1.7; color: var(--muted) !important; margin-bottom: 20px; }
 .pw-box input { width: 100%; padding: 12px; margin: 0 0 20px; border-radius: var(--radius); border: 1px solid #a6b49f; font-size: 16px; }
 .pw-box #script-unlock-error { color: var(--danger) !important; }
+.tour-replay { font-size: 12px; white-space: nowrap; }
+body[data-mode="teacher"] .tour-replay { display: none; }
+.tour-spotlight { position: fixed; z-index: 2300; border: 2px solid #b4d39f; border-radius: 5px; box-shadow: 0 0 0 100vmax #172a207d; pointer-events: none; }
+.tour-panel { position: fixed; inset: auto; margin: 0; z-index: 2400; padding: 23px; border: 0; border-radius: 6px; color: var(--ink); background: var(--surface); box-shadow: 0 15px 45px #14241b33; overflow-y: auto; overflow-wrap: anywhere; }
+.tour-panel h2 { font-size: 18px; font-weight: 600; letter-spacing: -.02em; line-height: 1.4; margin: 0 0 11px; }
+.tour-panel .tour-copy > p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--muted); }
+.tour-progress { margin: 17px 0 13px; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.tour-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.tour-actions > div { display: flex; gap: 6px; }
+.tour-actions .btn { min-height: 38px; padding: 8px 12px; }
+.tour-actions .btn:disabled { background: var(--bg); color: var(--muted); border-color: var(--border); }
+.tour-skip { padding: 8px 0; border: 0; background: transparent; color: var(--muted); font-size: 12px; text-decoration: underline; text-underline-offset: 3px; }
+.tour-skip:hover { color: var(--primary); }
+@media (max-width: 480px) { .tour-panel { padding: 21px; } .tour-actions .btn { min-height: 42px; } }
 body[data-sample="true"] #add-cluster-btn, body[data-sample="true"] #code-pool-wrap, body[data-sample="true"] #codes-panel > .btn { display: none; }
 @media (min-width: 1700px) { .app-header, .activity-nav { padding-left: 48px; padding-right: 48px; } main, #stage-workspace { padding-left: 48px; padding-right: 48px; } #stage-tabs { margin-left: 48px; margin-right: 48px; } .workbook-heading, .lesson-context { padding-left: 48px; padding-right: 48px; } }
 @media (max-width: 1150px) {
@@ -266,7 +280,7 @@ body[data-sample="true"] #add-cluster-btn, body[data-sample="true"] #code-pool-w
     .app-identity h1 { font-size: 16px; }
     .app-identity p { font-size: 11px; line-height: 1.7; }
     #session-name { display: none; }
-    .session-tools { gap: 0; }
+    .session-tools { gap: 12px; }
     .activity-nav { padding: 10px 20px; gap: 10px; flex-direction: column; align-items: stretch; }
     .activity-group-label { min-width: 96px; font-size: 11px; }
     .btn-script { font-size: 11px; padding: 7px 8px; min-height: 34px; }

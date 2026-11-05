@@ -6,8 +6,29 @@
   try {
     beginSession();
     check('Empty name produces an error', id('landing-error').style.display === 'block');
+    check('Tour waits until a name has been accepted', !id('interface-tour').open);
     id('landing-name').value = 'workbook test'; beginSession(); await settle();
     check('Name entry opens workbook and unlocks keyboard access', id('student-name').value === 'Workbook Test' && !id('workbook-app').inert);
+    check('First entry automatically opens the six-step interface tour', id('interface-tour').open && id('tour-progress').textContent === 'Step 1 of 6');
+    check('Tour leaves real workbook controls available', !id('workbook-app').inert && id('interface-tour').getAttribute('aria-modal') !== 'true');
+    const tourRect = id('interface-tour').getBoundingClientRect();
+    check('Tour panel fits the current viewport', tourRect.left >= 0 && tourRect.right <= innerWidth + 1 && tourRect.top >= 0 && tourRect.bottom <= innerHeight + 1);
+    id('tour-next-btn').click(); check('Tour Next highlights the learning sequence', id('interface-tour').dataset.step === 'steps');
+    id('tour-back-btn').click(); check('Tour Back returns to the activity choices', id('interface-tour').dataset.step === 'activities');
+    id('tour-skip-btn').click(); check('Skip closes and remembers dismissal', !id('interface-tour').open && localStorage.getItem('qcw_interface_tour_v1:workbook test') === 'seen');
+    document.dispatchEvent(new Event('workbook:entered')); await settle();
+    check('Returning students are not shown the tour again', !id('interface-tour').open);
+    id('tour-start-btn').click(); check('Interface tour button replays the walkthrough', id('interface-tour').open);
+    document.dispatchEvent(new KeyboardEvent('keydown', {key:'Escape',bubbles:true})); check('Escape dismisses the tour', !id('interface-tour').open);
+    id('student-name').value = 'Tour Second Student'; document.dispatchEvent(new Event('workbook:entered')); await settle();
+    check('A different student receives their own first-entry tour', id('interface-tour').open);
+    const workbookBeforeTour = JSON.stringify({script:currentScript,stage:currentStage,codes:myCodes,analysis:gatherAnalysisData()});
+    for (let step = 0; step < 5; step++) id('tour-next-btn').click();
+    check('Last tour step gives a clear Start coding action', id('tour-next-btn').textContent === 'Start coding');
+    id('tour-next-btn').click();
+    check('Completing the automatic tour focuses the workspace', !id('interface-tour').open && document.activeElement === id('t1'));
+    check('The tour leaves coding and analysis data unchanged', JSON.stringify({script:currentScript,stage:currentStage,codes:myCodes,analysis:gatherAnalysisData()}) === workbookBeforeTour);
+    id('student-name').value = 'Workbook Test';
     check('Future analysis steps start locked', id('stab-2').classList.contains('tab-locked'));
     switchStage(2); check('Stage gate prevents skipping submission', currentStage === 1);
 
@@ -54,13 +75,16 @@
       await settle(); check('Worked example ' + sample + ' explanations render as wrapped text', document.querySelector('.cluster-category-input').hidden && document.querySelectorAll('.sample-field-text').length >= 2);
       switchStage(3); check('Worked example ' + sample + ' shows extract testing', id('s3-clusters-container').querySelector('.s3-code-block'));
       switchStage(4); check('Worked example ' + sample + ' shows read-only theme', id('s4-pattern').readOnly && id('s4-pattern').value.length > 20);
+      id('tour-start-btn').click(); await settle(); check('Worked example ' + sample + ' tour omits unavailable editing tools', id('interface-tour').open && id('tour-progress').textContent === 'Step 1 of 3'); id('tour-skip-btn').click();
     }
 
-    loadScript(1); requestScript2(); id('script-unlock-input').value = 'BAD'; checkScriptUnlock(); await settle();
+    loadScript(1); id('tour-start-btn').click(); requestScript2(); await settle();
+    check('Exploring a class access control closes the tour for the real dialog', !id('interface-tour').open && id('script-unlock-modal').style.display === 'flex');
+    id('script-unlock-input').value = 'BAD'; checkScriptUnlock(); await settle();
     check('Incorrect class access code keeps script locked', !script2Unlocked && id('script-unlock-error').style.display === 'block');
     id('script-unlock-input').value = 'TEST'; checkScriptUnlock(); await settle();
     check('Correct class access code opens second transcript', script2Unlocked && currentScript === 2);
-    setMode('teacher'); await settle(); check('Instructor dialog isolates keyboard focus', id('workbook-app').inert && id('pw-modal').style.display === 'flex');
+    id('tour-start-btn').click(); setMode('teacher'); await settle(); check('Instructor dialog isolates keyboard focus', !id('interface-tour').open && id('workbook-app').inert && id('pw-modal').style.display === 'flex');
     id('pw-input').value = 'TEST'; await checkPassword(); await settle();
     check('Verified instructor opens review tools and hides coding bar', currentMode === 'teacher' && !id('teacher-tools').classList.contains('hidden') && id('coding-bar').classList.contains('hidden'));
     submissions = {

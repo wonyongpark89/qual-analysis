@@ -128,7 +128,10 @@
         byId('workbook-app').inert = !!next;
         dialogs.forEach(dialog => { dialog.inert = dialog !== next; });
         if (!next && wasDialog) {
-            if (wasDialog.id === 'landing-modal') byId('btn-s1').focus();
+            if (wasDialog.id === 'landing-modal') {
+                byId('btn-s1').focus();
+                document.dispatchEvent(new Event('workbook:entered'));
+            }
             else if (returnFocus && !returnFocus.closest('[role="dialog"]')) returnFocus.focus();
             returnFocus = null;
         }

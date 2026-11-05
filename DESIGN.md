@@ -281,6 +281,8 @@ The collapsible reference line keeps definitions alongside the current task with
 
 Access dialogs are centered white panels capped at 390px over a translucent dark-green veil, using dialog corners and the access shadow. Focus remains inside an open dialog; workbook content is inert, and focus returns on close. Name entry uses the larger handbook spread. Temporary gate feedback uses the deep-green overlay vocabulary above the coding bar.
 
+The interface tour reuses the white overlay surface, dialog corners, deep-green primary action, and system sans. A non-modal panel sits beside a highlighted control where space permits, or above/below it on narrow screens. A functional dimmed spotlight identifies the current target. Steps stay brief, with written progress, Back, Next, and a persistent Skip tour action. The replay control belongs to the session tools. Do not require practice edits or change workbook data during the tour.
+
 ## Do's and Don'ts
 
 ### Do:
