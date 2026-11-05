@@ -2,514 +2,50 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Qualitative Coding Workbook</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234f46e5'/><path d='M30 30h20l20 20-20 20-20-20V30z' fill='white'/><circle cx='40' cy='40' r='5' fill='%234f46e5'/></svg>">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%274%27 fill=%27%23243d34%27/%3E%3Cpath d=%27M9 8h14M9 13h14M9 18h8M9 23h11%27 stroke=%27white%27 stroke-width=%272%27/%3E%3C/svg%3E">
     
-    <style>
-        :root { 
-            --bg: #f9fafb; 
-            --primary: #1e293b; 
-            --accent: #4f46e5; 
-            --success: #10b981; 
-            --teacher: #7c3aed; 
-            --danger: #ef4444; 
-            --border: #e5e7eb;
-            --radius: 10px;
-        }
-        
-        body { 
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            margin: 0; 
-            display: flex; 
-            flex-direction: column; 
-            height: 100dvh; 
-            background: var(--bg); 
-            color: #334155;
-            overflow: hidden; 
-        }
-        
-        header { 
-            background: white; 
-            color: var(--primary); 
-            padding: 12px 24px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            z-index: 10; 
-            border-bottom: 1px solid var(--border);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-
-        .nav-group { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        
-        .btn { 
-            border: 1px solid var(--border); 
-            padding: 8px 14px; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            font-weight: 500; 
-            transition: all 0.2s; 
-            font-size: 0.8rem; 
-            background: white;
-            color: #64748b;
-            white-space: nowrap;
-            box-sizing: border-box;
-        }
-        
-        .btn:hover { background: #f1f5f9; border-color: #cbd5e1; }
-        .btn-script.active { background: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2); }
-        .btn-sample { border-style: dashed; }
-        
-        .btn-mode { font-weight: 700; letter-spacing: 0.05em; }
-        #btn-student-mode.active { background: var(--success); color: white; border-color: var(--success); }
-        #btn-teacher-mode.active { background: var(--teacher); color: white; border-color: var(--teacher); }
-
-        main { display: flex; flex: 1; overflow: hidden; padding: 20px; gap: 20px; margin-bottom: 0; transition: margin-bottom 0.2s; }
-        main.coding-bar-visible { margin-bottom: 80px; }
-        .column { display: flex; flex-direction: column; gap: 20px; flex: 1; min-width: 0; }
-        
-        .workspace-card { 
-            background: white; 
-            border-radius: var(--radius); 
-            border: 1px solid var(--border);
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden; 
-            flex: 1; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-        }
-        
-        .card-header { padding: 12px 20px; background: #f8fafc; border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
-        
-        .content-area { 
-            padding: 24px; 
-            overflow-y: auto; 
-            flex: 1; 
-            line-height: 3.5; 
-            font-size: 1.05rem; 
-            color: #1e293b;
-            -webkit-overflow-scrolling: touch; 
-        }
-        
-        .p-block { margin-bottom: 24px; border-left: 2px solid #f1f5f9; padding-left: 18px; }
-        .speaker { font-weight: 700; color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; display: block; margin-bottom: 4px; line-height: 1.2; }
-
-        .summary-box { background: #f8fafc; border-top: 1px solid var(--border); padding: 16px 20px; min-height: 80px; max-height: 120px; overflow-y: auto; }
-        .summary-title { margin: 0 0 10px 0; color: #64748b; font-size: 0.7rem; text-transform: uppercase; font-weight: 800; letter-spacing: 0.05em; }
-
-        #sidebar { width: 300px; display: flex; flex-direction: column; gap: 20px; flex-shrink: 0; overflow-y: auto; }
-        .sidebar-panel { background: white; padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); }
-        .sidebar-panel h4 { font-size: 0.9rem; margin-top: 0; color: #1e293b; margin-bottom: 12px; }
-
-        .input-label { display: block; font-size: 0.7rem; color: #64748b; margin-bottom: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
-        .copyright { font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; text-align: center; margin-top: auto; padding-bottom: 10px; letter-spacing: 0.05em; }
-
-        #coding-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #1e293b; padding: 16px 30px; box-sizing: border-box; display: flex; gap: 15px; align-items: center; z-index: 100; box-shadow: 0 -4px 20px rgba(0,0,0,0.1); }
-        #code-input { flex: 1; padding: 14px 18px; border-radius: 8px; border: 1px solid #334155; background: #334155; color: white; font-size: 1rem; transition: 0.2s; }
-        #code-input:focus { outline: none; border-color: var(--accent); background: #475569; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.4); transform: scale(1.02); }
-        #apply-btn { background: var(--accent); color: white; padding: 14px 28px; font-size: 0.95rem; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; }
-
-        .highlighted { 
-            display: inline; 
-            padding: 0.2em 0; 
-            border-radius: 4px; 
-            box-decoration-break: clone;
-            -webkit-box-decoration-break: clone;
-            position: relative;
-        }
-
-        .teacher-label { 
-            font-size: 0.85rem; 
-            font-weight: 800; 
-            text-transform: uppercase; 
-            padding: 2px 6px; 
-            border-radius: 3px; 
-            color: white; 
-            display: inline-flex;
-            align-items: center;
-            line-height: 1.1;
-            margin-left: 6px;
-            vertical-align: middle;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-            user-select: none;
-        }
-
-        .uncode-inline { margin-left: 5px; cursor: pointer; opacity: 0.8; font-size: 1.2rem; line-height: 0.8; font-weight: normal; }
-        .uncode-inline:hover { opacity: 1; color: #fff; }
-
-        .pending-selection { background-color: rgba(79, 70, 229, 0.1); border-bottom: 2px dashed var(--accent); display: inline; }
-        .code-badge { padding: 10px; margin-bottom: 8px; border-radius: 8px; font-size: 0.8rem; border: 1px solid rgba(0,0,0,0.05); border-left: 4px solid var(--accent); background: #f8fafc; position: relative; }
-        .remove-code-btn { position: absolute; top: 5px; right: 8px; cursor: pointer; color: #94a3b8; font-weight: bold; font-size: 1rem; }
-
-        #pw-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .pw-box { background: white; padding: 32px; border-radius: 16px; text-align: center; width: 90%; max-width: 320px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
-        .pw-box input { width: 100%; padding: 12px; margin: 15px 0; border-radius: 8px; border: 1px solid var(--border); text-align: center; font-size: 1.1rem; }
-
-        @media print {
-            header, #sidebar, #coding-bar, .btn, .student-select, #student-instructions, .uncode-inline { display: none !important; }
-            body, main { background: white; height: auto; overflow: visible; display: block; padding: 0; margin: 0; }
-            .content-area { overflow: visible; height: auto; line-height: 4.5; }
-            .highlighted { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            .teacher-label { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; border: none; }
-        }
-
-        @media (max-width: 1024px) {
-            body { overflow-y: auto; height: auto; min-height: 100dvh; }
-            main { flex-direction: column; overflow: visible; padding: 15px; }
-            main.coding-bar-visible { padding-bottom: 120px; }
-            #sidebar { width: 100%; order: 2; padding-bottom: 100px; }
-            .column { height: auto; min-height: 450px; }
-            #coding-bar { padding: 12px; gap: 8px; }
-            #stage-tabs { -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%); mask-image: linear-gradient(to right, black 85%, transparent 100%); }
-        }
-
-        .hidden { display: none !important; }
-        .student-select { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); font-size: 0.85rem; background: white; width: 100%; max-width: 200px; }
-
-        .sample-banner { background: #f0fdf4; border: 1px solid #bbf7d0; border-left: 4px solid var(--success); padding: 8px 14px; font-size: 0.78rem; color: #166534; display: flex; align-items: center; gap: 8px; }
-        .sample-banner::before { content: "👁"; font-size: 0.9rem; }
-
-        /* ── Stage tabs (Script 2 student mode only) ── */
-        #stage-tabs {
-            display: none;
-            background: white;
-            border-bottom: 1px solid var(--border);
-            padding: 0 24px;
-            gap: 0;
-            overflow-x: auto;
-            flex-shrink: 0;
-            align-items: center;
-        }
-        #stage-tabs.visible { display: flex; }
-        .stage-tab {
-            padding: 10px 18px;
-            font-size: 0.8rem; font-weight: 600;
-            color: #64748b; cursor: pointer;
-            border: none; background: none;
-            border-bottom: 3px solid transparent;
-            white-space: nowrap;
-            transition: color 0.15s, border-color 0.15s;
-        }
-        .stage-tab:hover { color: var(--accent); }
-        .stage-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-        .stage-tab .tab-num {
-            display: inline-block; width: 18px; height: 18px; line-height: 18px;
-            border-radius: 50%; background: #e2e8f0; color: #64748b;
-            font-size: 0.68rem; font-weight: 700; text-align: center;
-            margin-right: 6px; transition: background 0.15s, color 0.15s;
-        }
-        .stage-tab.active .tab-num { background: var(--accent); color: white; }
-        .stage-tab.tab-locked { opacity: 0.4; cursor: not-allowed; }
-        .stage-tab.tab-locked:hover { color: #64748b; }
-        #stage-tab-nav {
-            margin-left: auto; display: flex; align-items: center; gap: 6px; padding: 6px 0;
-        }
-        .stage-nav-prev, .stage-nav-next {
-            padding: 5px 14px; border-radius: 6px; border: 1px solid var(--border);
-            background: white; font-size: 0.78rem; font-weight: 600;
-            cursor: pointer; color: #64748b; transition: all 0.15s;
-            white-space: nowrap;
-        }
-        .stage-nav-prev:hover { background: #f1f5f9; }
-        .stage-nav-prev:disabled, .stage-nav-next:disabled { opacity: 0.3; cursor: default; background: white; }
-        .stage-nav-next { background: var(--accent); color: white; border-color: var(--accent); }
-        .stage-nav-next:hover { background: #4338ca; border-color: #4338ca; }
-        .stage-nav-next:disabled { background: #e2e8f0; color: #94a3b8; border-color: #e2e8f0; }
-
-        /* ── Stage workspace (Stages 2-4 full view) ── */
-        #stage-workspace {
-            display: none;
-            flex: 1; overflow: hidden;
-            padding: 20px; gap: 20px;
-        }
-        #stage-workspace.visible { display: flex; }
-
-        .stage-instructions {
-            background: #eff6ff; border: 1px solid #dbeafe;
-            border-radius: var(--radius);
-            padding: 10px 16px; font-size: 0.82rem; color: #1e40af; line-height: 1.5;
-            flex-shrink: 0;
-        }
-
-        /* Definition box — visually distinct from instruction and scaffold */
-        #student-instructions .definition-box,
-        #student-instructions .stage-instructions {
-            border-radius: 0;
-            border-left: none;
-            border-right: none;
-            border-top: none;
-        }
-        #student-instructions .definition-box:first-child {
-            border-top: 1px solid #fcd34d;
-        }
-        #student-instructions .stage-instructions:last-child {
-            border-bottom: 1px solid #dbeafe;
-        }
-        .definition-box {
-            background: #fffbeb; border: 1px solid #fcd34d;
-            border-left: 4px solid #f59e0b;
-            border-radius: var(--radius);
-            padding: 12px 16px; flex-shrink: 0;
-        }
-        .definition-box .def-label {
-            font-size: 0.65rem; font-weight: 800; text-transform: uppercase;
-            letter-spacing: 0.08em; color: #92400e; margin-bottom: 6px;
-            display: flex; align-items: center; gap: 5px;
-        }
-        .definition-box .def-label::before {
-            content: "◆";
-            font-size: 0.55rem;
-        }
-        .definition-box p {
-            margin: 0; font-size: 0.82rem; color: #78350f;
-            line-height: 1.6; font-style: italic;
-        }
-
-        /* Stage 2 layout: left = code pool + clusters, right = transcript reference */
-        #stage-workspace .sw-main {
-            flex: 1; display: flex; flex-direction: column; gap: 14px;
-            overflow-y: auto; min-width: 0;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        /* JS-driven tooltip (safe positioning) */
-        #pool-tooltip {
-            position: fixed;
-            background: #1e293b; color: white;
-            font-size: 0.72rem; font-weight: 400;
-            padding: 6px 10px; border-radius: 5px;
-            white-space: normal; max-width: 240px;
-            line-height: 1.4; text-align: left;
-            pointer-events: none;
-            z-index: 9999;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-            display: none;
-        }
-
-        /* Code pool */
-        #code-pool-wrap { background: white; border-radius: var(--radius); border: 1px solid var(--border); padding: 14px; flex-shrink: 0; }
-        #code-pool-wrap h3 { margin: 0 0 10px; font-size: 0.72rem; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.05em; }
-        #code-pool { display: flex; flex-wrap: wrap; gap: 8px; min-height: 36px; }
-        .pool-card {
-            padding: 6px 12px; border-radius: 6px;
-            font-size: 0.8rem; font-weight: 600;
-            cursor: grab; user-select: none;
-            border: 1px solid rgba(0,0,0,0.08);
-            touch-action: none;
-            position: relative;
-        }
-        .pool-card:active { cursor: grabbing; }
-        .pool-card.dragging { opacity: 0.4; }
-        .pool-card .return-btn {
-            display: inline-block; margin-left: 5px; cursor: pointer;
-            opacity: 0.55; font-weight: bold; font-size: 0.9rem;
-            line-height: 1; vertical-align: middle;
-        }
-        .pool-card .return-btn:hover { opacity: 1; }
-
-        /* Clusters */
-        #clusters-wrap { display: flex; flex-direction: column; gap: 12px; }
-        .cluster-card { background: white; border-radius: var(--radius); border: 1px solid var(--border); padding: 14px; }
-        .cluster-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
-        .cluster-name-input {
-            flex: 1; min-width: 140px;
-            padding: 7px 12px; border-radius: 6px;
-            border: 1px solid var(--border); font-size: 0.85rem;
-            font-weight: 600; color: var(--primary);
-        }
-        .cluster-name-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(79,70,229,0.15); }
-        .cluster-drop-zone {
-            min-height: 44px; border-radius: 6px;
-            border: 2px dashed #e2e8f0;
-            display: flex; flex-wrap: wrap; gap: 8px;
-            padding: 8px; transition: border-color 0.2s, background 0.2s;
-        }
-        .cluster-drop-zone.drag-over { border-color: var(--accent); background: #eef2ff; }
-        .cluster-category-wrap { margin-top: 10px; border-top: 1px solid #f1f5f9; padding-top: 10px; }
-        .cat-label { font-size: 0.7rem; text-transform: uppercase; color: #94a3b8; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 6px; }
-        .cluster-category-input {
-            width: 100%; box-sizing: border-box;
-            padding: 7px 12px; border-radius: 6px;
-            border: 1px solid var(--border); font-size: 0.85rem;
-            color: #4338ca; font-style: italic;
-        }
-        .cluster-category-input:focus { outline: none; border-color: #7c3aed; box-shadow: 0 0 0 2px rgba(124,58,237,0.15); }
-        .cluster-category-input::placeholder { color: #c4b5fd; }
-        .remove-cluster-btn {
-            padding: 4px 10px; font-size: 0.75rem; border-radius: 6px;
-            border: 1px solid rgba(239,68,68,0.2); color: var(--danger);
-            background: white; cursor: pointer;
-        }
-        #add-cluster-btn {
-            padding: 10px; border-radius: 8px;
-            border: 2px dashed #cbd5e1; background: white;
-            color: #64748b; font-size: 0.85rem; cursor: pointer;
-            transition: border-color 0.2s, color 0.2s;
-        }
-        #add-cluster-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-        /* Stage 3 */
-        .s3-cluster-card { background: white; border-radius: var(--radius); border: 1px solid var(--border); padding: 16px; }
-        .s3-top { margin-bottom: 8px; }
-        .s3-name-input {
-            width: 100%; box-sizing: border-box;
-            padding: 8px 12px; border-radius: 6px;
-            border: 1px solid var(--border); font-size: 0.9rem;
-            font-weight: 700; color: var(--primary);
-        }
-        .s3-name-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(79,70,229,0.15); }
-        .s3-category-label { font-size: 0.75rem; color: #7c3aed; font-style: italic; margin: 0 0 10px; }
-        .s3-prompt { font-size: 0.78rem; color: #64748b; margin: 0 0 8px; font-style: italic; }
-        .s3-drop-zone {
-            min-height: 56px; border-radius: 6px;
-            border: 2px dashed #e2e8f0;
-            display: flex; flex-direction: column; gap: 8px;
-            padding: 8px; transition: border-color 0.2s, background 0.2s;
-        }
-        .s3-drop-zone.drag-over { border-color: var(--accent); background: #eef2ff; }
-        /* Code-level block (replaces per-segment card) */
-        .s3-code-block {
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-            overflow: hidden;
-            cursor: grab;
-            background: white;
-        }
-        .s3-code-block:active { cursor: grabbing; }
-        .s3-code-block.dragging { opacity: 0.4; }
-        .s3-code-block-header {
-            display: flex; align-items: center; gap: 8px;
-            padding: 7px 10px;
-            user-select: none;
-        }
-        .s3-code-label {
-            flex-shrink: 0; padding: 2px 7px; border-radius: 4px;
-            font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.02em; white-space: nowrap;
-        }
-        .s3-code-count {
-            font-size: 0.68rem; color: #94a3b8; font-weight: 500;
-        }
-        .s3-drag-hint {
-            margin-left: auto; font-size: 0.72rem; color: #cbd5e1;
-            user-select: none;
-        }
-        .s3-extracts-list {
-            border-top: 1px solid #f1f5f9;
-            padding: 6px 10px 8px;
-            display: flex; flex-direction: column; gap: 4px;
-        }
-        .s3-extract-row {
-            font-size: 0.76rem; color: #64748b;
-            line-height: 1.5; font-style: italic;
-            padding-left: 6px; border-left: 2px solid #e2e8f0;
-        }
-        /* legacy — kept for sample scripts which still use per-entry display */
-        .s3-code-card {
-            display: flex; align-items: flex-start; gap: 8px;
-            padding: 8px 10px; border-radius: 6px;
-            background: #f8fafc; border: 1px solid #e2e8f0;
-            border-left: 3px solid #94a3b8;
-            font-size: 0.8rem;
-        }
-        .s3-extract-text { color: #475569; line-height: 1.5; font-style: italic; }
-
-        /* Stage 3 submit bar */
-        #s3-submit-bar {
-            background: white; border-radius: var(--radius); border: 1px solid var(--border);
-            padding: 14px 16px; display: flex; align-items: center; gap: 10px; flex-shrink: 0;
-        }
-        #s3-submit-bar span { font-size: 0.78rem; color: #64748b; flex: 1; }
-        .s3-submit-btn {
-            padding: 9px 20px; border-radius: 6px; border: none;
-            background: var(--success); color: white;
-            font-size: 0.82rem; font-weight: 600; cursor: pointer; white-space: nowrap;
-        }
-        .s3-submit-btn:hover { background: #059669; }
-        .s3-submit-btn.sent { background: #94a3b8; cursor: default; }
-
-        /* Stage 4 */
-        .s4-section { background: white; border-radius: var(--radius); border: 1px solid var(--border); padding: 18px; }
-        .s4-section h3 { margin: 0 0 4px; font-size: 0.9rem; color: var(--primary); }
-        .s4-section .s4-sub { font-size: 0.78rem; color: #64748b; margin: 0 0 14px; line-height: 1.5; }
-        .s4-categories-list { display: flex; flex-direction: column; gap: 12px; }
-        .s4-cat-block { border-radius: 6px; border: 1px solid #e2e8f0; overflow: hidden; }
-        .s4-cat-header { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; padding: 9px 14px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
-        .s4-cat-name { font-weight: 700; font-size: 0.88rem; color: var(--primary); }
-        .s4-cat-phrase { font-size: 0.75rem; color: #7c3aed; font-style: italic; }
-        .s4-cat-extracts { padding: 8px 14px; display: flex; flex-direction: column; gap: 5px; }
-        .s4-extract-row { display: flex; align-items: flex-start; gap: 8px; font-size: 0.78rem; color: #475569; line-height: 1.5; }
-        .s4-extract-code { flex-shrink: 0; padding: 1px 6px; border-radius: 3px; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; margin-top: 2px; }
-        .s4-scaffold-box { background: #eff6ff; border-left: 3px solid var(--accent); border-radius: 6px; padding: 11px 14px; margin-bottom: 10px; }
-        .s4-scaffold-box p { margin: 0; font-size: 0.8rem; color: #1e40af; line-height: 1.6; }
-        .s4-field-label { font-size: 0.7rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 5px; }
-        .s4-textarea { width: 100%; box-sizing: border-box; padding: 10px 13px; border-radius: 6px; border: 1px solid var(--border); font-size: 0.85rem; resize: vertical; min-height: 80px; line-height: 1.6; font-family: inherit; }
-        .s4-textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(79,70,229,0.1); }
-        .s4-divider { border: none; border-top: 1px solid var(--border); margin: 6px 0 18px; }
-
-        /* Teacher analysis review */
-        #teacher-review { display: block; }
-        .pane-stage-btn {
-            flex: 1; padding: 5px 8px; border-radius: 6px;
-            border: 1px solid var(--border); background: white;
-            font-size: 0.75rem; font-weight: 600; cursor: pointer; color: #64748b;
-        }
-        .pane-stage-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
-        #analysis-workspace { background: var(--bg); }
-        .analysis-pane-name {
-            font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 8px;
-        }
-        .analysis-review-card { background: white; border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; margin-bottom: 0; }
-        .analysis-review-header { padding: 10px 14px; background: #f8fafc; border-bottom: 1px solid var(--border); font-size: 0.8rem; font-weight: 600; color: var(--primary); }
-        .analysis-review-body { padding: 12px 14px; font-size: 0.8rem; color: #475569; }
-        .analysis-section { margin-bottom: 12px; }
-        .analysis-section:last-child { margin-bottom: 0; }
-        .analysis-section-label { font-size: 0.68rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 4px; }
-        .analysis-cat-chip { display: inline-block; padding: 2px 8px; border-radius: 12px; background: #eef2ff; color: #4338ca; font-size: 0.72rem; font-weight: 600; border: 1px solid #c7d2fe; margin: 2px 3px 2px 0; }
-
-        @media (max-width: 768px) {
-            #stage-tabs { padding: 0 12px; }
-            .stage-tab { padding: 10px 12px; font-size: 0.75rem; }
-            #stage-workspace { padding: 12px; gap: 12px; }
-        }
-    </style>
+    <meta name="theme-color" content="#243d34">
+    <link rel="stylesheet" href="workbook.css">
 </head>
 <body>
 
-<!-- Landing page -->
-<div id="landing-modal" style="position:fixed;inset:0;background:white;z-index:2000;display:flex;align-items:center;justify-content:center;padding:24px;">
-    <div style="max-width:480px;width:100%;">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:28px;">
-            <div style="width:40px;height:40px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M5 5h8l6 6-6 6-8-8V5z" fill="white"/><circle cx="8" cy="8" r="2" fill="#4f46e5"/></svg>
-            </div>
-            <div>
-                <h1 style="margin:0;font-size:1.2rem;font-weight:800;color:var(--primary);">Qualitative Coding Workbook</h1>
-                <p style="margin:2px 0 0;font-size:0.78rem;color:#94a3b8;">Southampton Education School | EDUC6530 Data Analysis for Educational Research</p>
-            </div>
+<!-- Session entry -->
+<section id="landing-modal" class="welcome" role="dialog" aria-modal="true" aria-labelledby="welcome-title">
+    <div class="welcome-sheet">
+        <div class="welcome-intro">
+            <h1 id="welcome-title">Qualitative Coding<br>Workbook</h1>
+            <p class="course-line">Southampton Education School<br>EDUC6530 · Data Analysis for Educational Research</p>
+            <p class="welcome-description">Work closely with the data. Move from individual codes to categories, then develop an interpretation of what it means.</p>
+            <form class="welcome-form" onsubmit="event.preventDefault(); beginSession()">
+                <label for="landing-name">Your full name</label>
+                <input type="text" id="landing-name" autocomplete="name" placeholder="Enter your name" aria-describedby="name-help landing-error">
+                <p id="name-help">This name will appear on your submissions.</p>
+                <button class="btn primary-btn" type="submit">Begin workbook <span aria-hidden="true">→</span></button>
+                <p id="landing-error" role="alert" style="display:none;">Please enter your name to continue.</p>
+            </form>
+            <p class="device-note">Your progress is saved on this device as you work.</p>
         </div>
-        <p style="font-size:0.92rem;color:#475569;line-height:1.7;margin-bottom:24px;">
-            This workbook guides you through qualitative analysis step by step: coding a transcript, developing categories, testing those categories against the data, and writing a theme. Some activities are worked examples, while others are for you to complete yourself. Your progress is saved on this device as you work.
-        </p>
-        <label style="display:block;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#94a3b8;margin-bottom:6px;">Your full name</label>
-        <input type="text" id="landing-name" placeholder="Enter your name to begin…"
-            style="width:100%;box-sizing:border-box;padding:12px 16px;border-radius:8px;border:1px solid var(--border);font-size:1rem;margin-bottom:16px;font-family:inherit;text-transform:capitalize;"
-            onkeydown="if(event.key==='Enter') beginSession()">
-        <button onclick="beginSession()"
-            style="width:100%;padding:13px;background:var(--accent);color:white;border:none;border-radius:8px;font-size:0.95rem;font-weight:600;cursor:pointer;">
-            Begin →
-        </button>
-        <p id="landing-error" style="color:var(--danger);font-size:0.78rem;margin:8px 0 0;text-align:center;display:none;">Please enter your name to continue.</p>
+        <div class="welcome-route">
+            <h2>From transcript to theme</h2>
+            <p>Four steps, with practice activities and worked examples to guide you.</p>
+            <ol>
+                <li><span class="route-number">1</span><div><h3>Code the transcript</h3><p>Give meaningful extracts a short label.</p></div></li>
+                <li><span class="route-number">2</span><div><h3>Develop categories</h3><p>Group codes that share an idea.</p></div></li>
+                <li><span class="route-number">3</span><div><h3>Test your categories</h3><p>Check each group against the original data.</p></div></li>
+                <li><span class="route-number">4</span><div><h3>Develop a theme</h3><p>Interpret the meaning across categories.</p></div></li>
+            </ol>
+        </div>
     </div>
-</div>
+</section>
 
-<div id="pw-modal">
+<div id="pw-modal" role="dialog" aria-modal="true" aria-labelledby="instructor-title">
     <div class="pw-box">
-        <h3 style="margin-top:0">Instructor Access</h3>
+        <h2 id="instructor-title">Instructor access</h2>
         <p style="font-size:0.85rem; color:#64748b">Please enter your 4-digit security code.</p>
-        <input type="password" id="pw-input" placeholder="••••" onkeydown="if(event.key==='Enter') checkPassword()">
+        <label class="input-label" for="pw-input">Security code</label>
+        <input type="password" id="pw-input" inputmode="numeric" autocomplete="off" placeholder="••••" onkeydown="if(event.key==='Enter') checkPassword()">
         <div style="display:flex; gap:10px">
             <button class="btn btn-verify-action" style="flex:1; background:var(--teacher); color:white; border:none" onclick="checkPassword()">Verify</button>
             <button class="btn" style="flex:1" onclick="closePwModal()">Cancel</button>
@@ -517,10 +53,11 @@
     </div>
 </div>
 
-<div id="script-unlock-modal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.8);backdrop-filter:blur(4px);display:none;justify-content:center;align-items:center;z-index:1000;">
+<div id="script-unlock-modal" role="dialog" aria-modal="true" aria-labelledby="unlock-title" style="display:none;">
     <div class="pw-box">
-        <h3 style="margin-top:0">Unlock Script 2</h3>
+        <h2 id="unlock-title">Unlock English Anxiety</h2>
         <p style="font-size:0.85rem;color:#64748b;">This is an in-class exercise and is only accessible during the seminar. Your tutor will provide the code.</p>
+        <label class="input-label" for="script-unlock-input">Class access code</label>
         <input type="text" id="script-unlock-input" placeholder="Enter code…" autocomplete="off" style="text-transform:uppercase;" onkeydown="if(event.key==='Enter') checkScriptUnlock()">
         <p id="script-unlock-error" style="color:var(--danger);font-size:0.78rem;margin:0 0 10px;display:none;">Incorrect code. Try again.</p>
         <div style="display:flex;gap:10px">
@@ -530,34 +67,39 @@
     </div>
 </div>
 
-<header>
-    <div class="nav-group">
-        <button class="btn btn-script active" id="btn-s1" onclick="loadScript(1)">1. AI in Education</button>
-        <button class="btn btn-script" id="btn-s2" onclick="requestScript2()"><span id="s2-lock" style="margin-right:4px;">🔒</span>2. English Anxiety</button>
-        <button class="btn btn-script btn-sample" id="btn-s3" onclick="loadScript(3)">Sample: Versus Coding</button>
-        <button class="btn btn-script btn-sample" id="btn-s4" onclick="loadScript(4)">Sample: Emotion Coding</button>
-        <button class="btn btn-script btn-sample" id="btn-s5" onclick="loadScript(5)">Sample: In Vivo Coding</button>
-    </div>
-    <div class="nav-group">
-        <button id="btn-student-mode" class="btn btn-mode active" onclick="setMode('student')">STUDENT</button>
-        <button id="btn-teacher-mode" class="btn btn-mode" onclick="setMode('teacher')">INSTRUCTOR</button>
-    </div>
+<div id="workbook-app" inert>
+<a class="skip-link" href="#main-layout">Skip to the workspace</a>
+<header class="app-header">
+    <div class="app-identity"><h1>Qualitative Coding Workbook</h1><p>Southampton Education School <span aria-hidden="true">/</span> EDUC6530</p></div>
+    <div class="session-tools"><span id="session-name"></span><div class="nav-group mode-switch" aria-label="Workbook mode">
+        <button id="btn-student-mode" class="btn btn-mode active" onclick="setMode('student')">Student</button>
+        <button id="btn-teacher-mode" class="btn btn-mode" onclick="setMode('teacher')">Instructor</button>
+    </div></div>
 </header>
+<nav class="activity-nav" aria-label="Choose an activity">
+    <div class="activity-group"><span class="activity-group-label">Practice</span><div class="nav-group">
+        <button class="btn btn-script active" id="btn-s1" onclick="loadScript(1)">1. AI in Education</button>
+        <button class="btn btn-script" id="btn-s2" onclick="requestScript2()"><svg id="s2-lock" width="13" height="15" viewBox="0 0 16 18" fill="none" aria-hidden="true"><rect x="2.5" y="7.5" width="11" height="8" rx="1" stroke="currentColor"/><path d="M5 7V4a3 3 0 016 0v3" stroke="currentColor"/></svg>2. English Anxiety</button>
+    </div></div>
+    <div class="activity-group examples-group"><span class="activity-group-label">Worked examples</span><div class="nav-group">
+        <button class="btn btn-script btn-sample" id="btn-s3" onclick="loadScript(3)">Versus Coding</button>
+        <button class="btn btn-script btn-sample" id="btn-s4" onclick="loadScript(4)">Emotion Coding</button>
+        <button class="btn btn-script btn-sample" id="btn-s5" onclick="loadScript(5)">In Vivo Coding</button>
+    </div></div>
+</nav>
+<div class="workbook-heading"><div><h2 id="activity-title">AI in Education</h2><p id="activity-description">Practice transcript 1</p></div><span class="save-note">Progress saved on this device</span></div>
+<nav id="stage-tabs" aria-label="Analysis steps">
+    <button class="stage-tab active" id="stab-1" onclick="switchStage(1)"><span class="tab-num">1</span><span class="step-copy"><strong>Coding</strong><span>Label meaningful extracts</span><small class="step-state">Current step</small></span></button>
+    <button class="stage-tab" id="stab-2" onclick="switchStage(2)"><span class="tab-num">2</span><span class="step-copy"><strong>Developing categories</strong><span>Find shared ideas</span><small class="step-state">Locked</small></span></button>
+    <button class="stage-tab" id="stab-3" onclick="switchStage(3)"><span class="tab-num">3</span><span class="step-copy"><strong>Testing categories</strong><span>Return to the data</span><small class="step-state">Locked</small></span></button>
+    <button class="stage-tab" id="stab-4" onclick="switchStage(4)"><span class="tab-num">4</span><span class="step-copy"><strong>Developing themes</strong><span>Interpret the meaning</span><small class="step-state">Locked</small></span></button>
+</nav>
+<section class="lesson-context" aria-label="Current task">
+    <div><h3 id="lesson-task">Code the transcript</h3><p id="next-step-note" aria-live="polite">Submit your coding to continue to categories.</p></div>
+    <div id="stage-tab-nav"><button class="stage-nav-prev" id="stage-prev-btn" onclick="switchStage(currentStage - 1)" disabled aria-label="Previous analysis step">← Back</button><button class="stage-nav-next" id="stage-next-btn" onclick="switchStage(currentStage + 1)">Next step →</button></div>
+</section>
 
-<!-- Stage tab bar — only shown for Script 2 in student mode -->
-<div id="stage-tabs">
-    <button class="stage-tab active" id="stab-1" onclick="switchStage(1)"><span class="tab-num">1</span>Coding</button>
-    <button class="stage-tab" id="stab-2" onclick="switchStage(2)"><span class="tab-num">2</span>Developing Categories</button>
-    <button class="stage-tab" id="stab-3" onclick="switchStage(3)"><span class="tab-num">3</span>Testing Categories</button>
-    <button class="stage-tab" id="stab-4" onclick="switchStage(4)"><span class="tab-num">4</span>Developing Themes</button>
-    <div id="stage-tab-nav">
-        <button class="stage-nav-prev" id="stage-prev-btn" onclick="switchStage(currentStage - 1)" disabled>← Prev</button>
-        <button class="stage-nav-next" id="stage-next-btn" onclick="switchStage(currentStage + 1)">Next →</button>
-    </div>
-</div>
-
-<!-- Stage 1: Coding workspace (always shown for other scripts; shown for Script 2 Stage 1) -->
-<main id="main-layout">
+<main id="main-layout" tabindex="-1">
     <div class="column" id="col-1">
         <div class="workspace-card" id="pdf-content">
             <div class="card-header">
@@ -598,13 +140,13 @@
 
     <div id="sidebar">
         <div class="sidebar-panel" id="codes-panel">
-            <h4>My Codebook</h4>
+            <div class="panel-heading"><h3>My codebook</h3><span id="code-count" aria-label="Number of coded extracts">0</span></div><p class="panel-help">The labels you attach to the data.</p>
             <div id="code-list" style="max-height: 300px; overflow-y: auto; margin: 10px 0;"></div>
-            <button class="btn" style="width:100%; margin-top:5px; color:var(--danger); border-color:rgba(239, 68, 68, 0.2)" onclick="clearLocalCodes()">Clear Codes</button>
+            <button class="btn" style="width:100%; margin-top:5px; color:var(--danger); border-color:rgba(239, 68, 68, 0.2)" onclick="clearLocalCodes()">Clear all codes</button>
         </div>
 
         <div class="sidebar-panel" id="export-section">
-            <h4>Submission</h4>
+            <h3>Submit this step</h3><p class="panel-help">When you are ready, send your coding to your instructor to unlock categories.</p>
             <div id="submitting-as" style="font-size:0.82rem;color:#475569;margin-bottom:12px;padding:8px 12px;background:#f8fafc;border-radius:6px;border:1px solid var(--border);">
                 <span style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:#94a3b8;display:block;margin-bottom:2px;">Submitting as</span>
                 <span id="submitting-as-name" style="font-weight:600;color:var(--primary);"></span>
@@ -615,13 +157,13 @@
         </div>
 
         <div class="sidebar-panel hidden" id="teacher-tools">
-            <h4>Cloud Management</h4>
+            <h3>Class submissions</h3>
             <button class="btn" id="refresh-btn" style="width:100%; background:var(--accent); color:white; border:none" onclick="syncFromCloud()">Sync Submissions</button>
             <button class="btn" id="clear-btn" style="width:100%; margin-top:10px; color:var(--danger); border-color:rgba(239, 68, 68, 0.2)" onclick="clearCloudData()">Purge All Data</button>
         </div>
 
         <div class="sidebar-panel hidden" id="teacher-review">
-            <h4>Review Submissions</h4>
+            <h3>Review submissions</h3>
 
             <label class="input-label" style="margin-top:4px;">Left panel</label>
             <select id="sel-student-left" class="student-select" style="max-width:100%; margin-bottom:6px;" onchange="renderPane(1)">
@@ -649,7 +191,7 @@
 </main>
 
 <!-- Stage workspace: Stages 2–4 (Script 2 student mode, replaces main) -->
-<div id="stage-workspace">
+<section id="stage-workspace" aria-label="Analysis workspace">
     <!-- Stage 2 -->
     <div class="sw-main" id="sw-panel-2">
         <div style="font-size:0.78rem;color:#64748b;padding:2px 0 6px;line-height:1.5;"><strong style="color:var(--accent);">Stage 2 of 4:</strong> You've coded the transcript. Now move from individual <em>codes</em> to broader <em>categories</em>.</div>
@@ -720,15 +262,16 @@
         <textarea id="s4-nuance"   style="display:none;"></textarea>
         <div style="height:60px;flex-shrink:0;"></div>
     </div>
-</div>
+</section>
 
 <div id="coding-bar">
-    <input type="text" id="code-input" placeholder="Enter code label here...">
-    <button id="apply-btn" onclick="applyManualCode()">Apply Code</button>
+    <div class="coding-selection"><label for="code-input">Code the selected extract</label><p id="selection-note" aria-live="polite">Select a passage in the transcript to begin.</p></div>
+    <div class="coding-entry"><input type="text" id="code-input" placeholder="Give this extract a short label" aria-describedby="selection-note"><button id="apply-btn" onclick="applyManualCode()">Apply code <span aria-hidden="true">↵</span></button></div>
+</div>
 </div>
 
 <!-- JS tooltip for pool cards -->
-<div id="pool-tooltip"></div>
+<div id="pool-tooltip" role="tooltip"></div>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzEo0HjKylsTZ4jpcbBfIP3c_sPODpezIm1js7mH5hd_sWRtEcV4Vqgjb7umirx9wPv/exec";
@@ -2220,5 +1763,6 @@ ${pattern ? `<div class="theme-box"><p>${esc(pattern)}</p></div>` :'<p style="co
 
 
 </script>
+<script src="workbook.js"></script>
 </body>
 </html>
